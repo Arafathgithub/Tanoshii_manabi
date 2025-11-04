@@ -11,6 +11,11 @@ export interface UserProfile {
   goal: string;
 }
 
+export interface YouTubeReference {
+  title: string;
+  url: string;
+}
+
 export interface LearningTask {
   id: string;
   title: string;
@@ -18,6 +23,7 @@ export interface LearningTask {
   xp: number;
   completed: boolean;
   priority: boolean;
+  youtubeReferences?: YouTubeReference[];
 }
 
 export interface LearningModule {

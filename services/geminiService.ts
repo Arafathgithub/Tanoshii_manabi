@@ -35,6 +35,18 @@ const learningPathSchema = {
                 title: { type: Type.STRING, description: "Title of the task." },
                 description: { type: Type.STRING, description: "A brief description of what the task involves." },
                 xp: { type: Type.INTEGER, description: "Experience points (10-100) awarded for completing the task." },
+                youtubeReferences: {
+                  type: Type.ARRAY,
+                  description: "An array of 1-2 relevant YouTube video references for the task.",
+                  items: {
+                      type: Type.OBJECT,
+                      properties: {
+                          title: { type: Type.STRING, description: "The title of the YouTube video." },
+                          url: { type: Type.STRING, description: "A valid, direct URL to the YouTube video." }
+                      },
+                      required: ['title', 'url']
+                  }
+                }
               },
               required: ['title', 'description', 'xp'],
             },
@@ -58,6 +70,7 @@ export const generateLearningPath = async (profile: UserProfile): Promise<Learni
 
     Create a structured learning path with 5 to 7 modules. Each module must have a title, a short description, a unique and cool badge name for completion (e.g., 'React Ranger', 'Data Diviner'), and 3 to 5 specific, actionable tasks.
     Each task must have a title, a brief description, and an estimated 'xp' (experience points) value between 10 and 100 based on its difficulty.
+    For each task, also provide a 'youtubeReferences' array containing 1 or 2 real, helpful YouTube video links (with a title and url) that are relevant to completing the task.
     The tasks should be practical and project-oriented where possible.
     The tone should be encouraging and motivating.
     
