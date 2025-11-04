@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { UserProfile, LearningPath, AppState } from './types';
-import { generateLearningPath } from './services/geminiService';
+import { generateLearningPath } from './services/aiService';
 import OnboardingWizard from './components/OnboardingWizard';
 import Dashboard from './components/Dashboard';
 import { RocketIcon } from './components/icons/RocketIcon';
@@ -36,7 +36,7 @@ const App: React.FC = () => {
       setAppState('dashboard');
     } catch (err) {
       console.error('Failed to generate learning path:', err);
-      setError('Failed to generate your personalized learning path. The AI might be busy. Please try again later.');
+      setError('Failed to generate your personalized learning path. The selected AI model might be busy. Please try again later.');
       setAppState('error');
     }
   }, []);

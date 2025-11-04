@@ -1,9 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { UserProfile, CompetencyLevel, CareerGuidance } from '../types';
+import { UserProfile, CompetencyLevel, CareerGuidance, AIProvider } from '../types';
 import { INTERESTS_OPTIONS, COMPETENCY_LEVELS, GOAL_TEMPLATES } from '../constants';
-import { generateCareerGuidance } from '../services/geminiService';
+import { generateCareerGuidance } from '../services/aiService';
 import { LightBulbIcon } from './icons/LightBulbIcon';
 import { BriefcaseIcon } from './icons/BriefcaseIcon';
+import { GoogleIcon } from './icons/GoogleIcon';
+import { AzureIcon } from './icons/AzureIcon';
 
 
 interface OnboardingWizardProps {
@@ -15,6 +17,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   const [name, setName] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
   const [competency, setCompetency] = useState<CompetencyLevel>(CompetencyLevel.BEGINNER);
+  const [aiProvider, setAiProvider] = useState<AIProvider>('gemini');
   const [careerGuidance, setCareerGuidance] = useState<CareerGuidance | null>(null);
   const [isGuidanceLoading, setIsGuidanceLoading] = useState(false);
   const [guidanceError, setGuidanceError] = useState<string | null>(null);
@@ -27,7 +30,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
         setIsGuidanceLoading(true);
         setGuidanceError(null);
         try {
-          const guidance = await generateCareerGuidance(interests, competency);
+          const guidance = await generateCareerGuidance({ name, interests, competency, goal, aiProvider });
           setCareerGuidance(guidance);
         } catch (error) {
           console.error("Failed to get career guidance:", error);
@@ -38,7 +41,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
       };
       fetchGuidance();
     }
-  }, [step, interests, competency, careerGuidance]);
+  }, [step, name, interests, competency, goal, aiProvider, careerGuidance]);
 
   const suggestedGoals = useMemo(() => {
     const goals = new Set<string>();
@@ -70,7 +73,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (goal.trim()) {
-      onComplete({ name, interests, competency, goal });
+      onComplete({ name, interests, competency, goal, aiProvider });
     }
   };
 
@@ -133,8 +136,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
           )}
           {step === 3 && (
             <div className="animate-slide-in">
-              <h2 className="text-3xl font-bold mb-2 text-white">What's your current skill level?</h2>
-              <p className="text-gray-400 mb-6">This helps us tailor the content to the right difficulty.</p>
+              <h2 className="text-3xl font-bold mb-2 text-white">Tailor Your Experience</h2>
+              <p className="text-gray-400 mb-6">First, what's your current skill level in these topics?</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {COMPETENCY_LEVELS.map(level => (
                   <button
@@ -150,6 +153,33 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
                     <span className="text-lg font-semibold">{level}</span>
                   </button>
                 ))}
+              </div>
+              <p className="text-gray-400 mt-10 mb-4">Next, choose the AI engine to power your learning path.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setAiProvider('gemini')}
+                    className={`flex items-center justify-center gap-3 p-4 rounded-lg transition-all duration-200 ${
+                      aiProvider === 'gemini'
+                        ? 'bg-brand-primary text-white ring-2 ring-brand-secondary'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    <GoogleIcon className="w-6 h-6" />
+                    <span className="text-lg font-semibold">Google Gemini</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAiProvider('azure')}
+                    className={`flex items-center justify-center gap-3 p-4 rounded-lg transition-all duration-200 ${
+                        aiProvider === 'azure'
+                          ? 'bg-blue-600 text-white ring-2 ring-blue-500'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                  >
+                    <AzureIcon className="w-6 h-6" />
+                    <span className="text-lg font-semibold">Azure OpenAI</span>
+                  </button>
               </div>
             </div>
           )}

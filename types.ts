@@ -4,11 +4,14 @@ export enum CompetencyLevel {
   ADVANCED = 'Advanced',
 }
 
+export type AIProvider = 'gemini' | 'azure';
+
 export interface UserProfile {
   name: string;
   interests: string[];
   competency: CompetencyLevel;
   goal: string;
+  aiProvider: AIProvider;
 }
 
 export interface YouTubeReference {
@@ -18,7 +21,7 @@ export interface YouTubeReference {
 
 export interface LearningTask {
   id: string;
-  title: string;
+  title:string;
   description: string;
   xp: number;
   completed: boolean;

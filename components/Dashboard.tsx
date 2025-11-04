@@ -5,7 +5,7 @@ import { TrophyIcon } from './icons/TrophyIcon';
 import { FlagIcon } from './icons/FlagIcon';
 import { ChatBubbleIcon } from './icons/ChatBubbleIcon';
 import ChatBot from './ChatBot';
-import { generateChatResponse, resetChatSession } from '../services/geminiService';
+import { generateChatResponse } from '../services/aiService';
 import TaskDetailModal from './TaskDetailModal';
 import { FireIcon } from './icons/FireIcon';
 
@@ -240,19 +240,18 @@ const Dashboard: React.FC<DashboardProps> = ({ userProfile, initialLearningPath,
   }, [learningPath]);
   
   const handleReset = () => {
-      resetChatSession();
       localStorage.removeItem(STREAK_KEY);
       localStorage.removeItem(LAST_COMPLETION_KEY);
       onReset();
   }
 
   const handleSendMessage = async (message: string) => {
-    const newUserMessage: ChatMessage = { role: 'user', text: message };
-    setChatMessages(prev => [...prev, newUserMessage]);
+    const currentMessages = [...chatMessages, { role: 'user', text: message } as ChatMessage];
+    setChatMessages(currentMessages);
     setIsChatLoading(true);
 
     try {
-      const responseText = await generateChatResponse(message);
+      const responseText = await generateChatResponse(message, chatMessages, userProfile.aiProvider);
       const newModelMessage: ChatMessage = { role: 'model', text: responseText };
       setChatMessages(prev => [...prev, newModelMessage]);
     } catch (error) {
